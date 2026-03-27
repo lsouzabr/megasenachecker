@@ -1,4 +1,4 @@
-package com.mega.megasena_checker;
+package com.mega.megasenachecker;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
