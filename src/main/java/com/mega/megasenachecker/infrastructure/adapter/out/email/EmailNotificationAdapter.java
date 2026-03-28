@@ -1,16 +1,15 @@
-package com.mega.megasenachecker.service;
+package com.mega.megasenachecker.infrastructure.adapter.out.email;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.mega.megasenachecker.domain.port.out.NotificacaoPort;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
-public class EmailService {
+@Component
+public class EmailNotificationAdapter implements NotificacaoPort {
 
-    @Autowired
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
 
     @Value("${app.email.sender}")
     private String emailSender;
@@ -18,14 +17,18 @@ public class EmailService {
     @Value("${app.email.recipient}")
     private String emailRecipient;
 
-    public void enviar(String titulo, String mensagem) {
+    public EmailNotificationAdapter(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
+
+    @Override
+    public void notificar(String titulo, String mensagem) {
         SimpleMailMessage mail = new SimpleMailMessage();
         mail.setFrom(emailSender);
         mail.setTo(emailRecipient);
         mail.setSubject(titulo);
         mail.setText(mensagem);
-
         mailSender.send(mail);
-
     }
 }
+
