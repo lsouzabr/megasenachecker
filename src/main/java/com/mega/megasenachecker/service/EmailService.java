@@ -1,6 +1,7 @@
 package com.mega.megasenachecker.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -11,10 +12,16 @@ public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    public void enviar(String destino, String titulo, String mensagem) {
+    @Value("${app.email.sender}")
+    private String emailSender;
+
+    @Value("${app.email.recipient}")
+    private String emailRecipient;
+
+    public void enviar(String titulo, String mensagem) {
         SimpleMailMessage mail = new SimpleMailMessage();
-        mail.setFrom("lsouzabr@gmail.com");
-        mail.setTo("lsouzabr@gmail.com");
+        mail.setFrom(emailSender);
+        mail.setTo(emailRecipient);
         mail.setSubject(titulo);
         mail.setText(mensagem);
 

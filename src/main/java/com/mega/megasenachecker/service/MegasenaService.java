@@ -72,6 +72,7 @@ public class MegasenaService {
                         .filter(dezenas::contains)
                         .collect(Collectors.toList());
 
+
                     resultMessage.append("--------------------------------------------------\n");
                     resultMessage.append(meuJogo).append("\n");
                     resultMessage.append("Quantidade de acertos: ").append(acertos.size()).append("\n");
@@ -90,7 +91,7 @@ public class MegasenaService {
                     resultMessage.append("--------------------------------------------------\n");
 
 
-                    emailService.enviar("lsouzabr@gmail.com", "Resultado do Concurso " + document.getConcurso() + " - Acertos: " + acertos.size(), resultMessage.toString());
+                    emailService.enviar("Resultado do Concurso " + document.getConcurso() + " - Acertos: " + acertos.size(), resultMessage.toString());
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
