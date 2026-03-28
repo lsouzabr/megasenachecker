@@ -1,6 +1,6 @@
 package com.mega.megasenachecker.function;
-import com.mega.megasenachecker.repository.MegasenaRepository;
 import com.mega.megasenachecker.service.MegasenaService;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -10,10 +10,10 @@ import java.util.function.Function;
 public class MegaFunctionConfig {
 
     @Bean
-    public Function<String, String> processarMega(MegasenaService megasenaService, MegasenaRepository repository) {
+    public Function<String, String> processarMega(MegasenaService megasenaService, DynamoDbEnhancedClient dynamoDbEnhancedClient) {
         return input -> {
             System.out.println("Rodando com input: " + input);
-            return megasenaService.verificarSorteio(repository);
+            return megasenaService.verificarSorteio(dynamoDbEnhancedClient);
         };
     }
 }
