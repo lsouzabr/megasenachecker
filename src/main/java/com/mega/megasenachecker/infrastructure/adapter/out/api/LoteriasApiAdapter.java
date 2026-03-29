@@ -15,7 +15,11 @@ import java.util.List;
 public class LoteriasApiAdapter implements LoteriasGateway {
 
     private static final String URL = "https://loteriascaixa-api.herokuapp.com/api/megasena/latest";
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
+
+    public LoteriasApiAdapter(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     @Override
     public Concurso buscarUltimoSorteio() {

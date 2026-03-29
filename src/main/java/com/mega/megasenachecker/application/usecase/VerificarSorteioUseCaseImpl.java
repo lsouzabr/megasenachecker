@@ -19,7 +19,7 @@ public class VerificarSorteioUseCaseImpl implements VerificarSorteioUseCase {
     private final LoteriasGateway loteriasGateway;
     private final NotificacaoPort notificacaoPort;
 
-    @Value("${app.meuJogo:04,11,15,29,38,41}")
+    @Value("${app.meuJogo}")
     private String meuJogoConfig;
 
     public VerificarSorteioUseCaseImpl(

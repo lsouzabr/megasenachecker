@@ -2,6 +2,7 @@ package com.mega.megasenachecker.infrastructure.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
@@ -13,6 +14,11 @@ public class DynamoConfig {
         return DynamoDbEnhancedClient.builder()
                 .dynamoDbClient(client)
                 .build();
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 }
 
