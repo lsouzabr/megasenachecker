@@ -5,6 +5,8 @@ import com.mega.megasenachecker.domain.port.in.VerificarSorteioUseCase;
 import com.mega.megasenachecker.domain.port.out.ConcursoRepository;
 import com.mega.megasenachecker.domain.port.out.LoteriasGateway;
 import com.mega.megasenachecker.domain.port.out.NotificacaoPort;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -15,20 +17,22 @@ import java.util.stream.Collectors;
 @Service
 public class VerificarSorteioUseCaseImpl implements VerificarSorteioUseCase {
 
+    private static final Logger log = LoggerFactory.getLogger(VerificarSorteioUseCaseImpl.class);
+
     private final ConcursoRepository concursoRepository;
     private final LoteriasGateway loteriasGateway;
     private final NotificacaoPort notificacaoPort;
-
-    @Value("${app.meuJogo:04,11,15,29,38,41}")
-    private String meuJogoConfig;
+    private final String meuJogoConfig;
 
     public VerificarSorteioUseCaseImpl(
             ConcursoRepository concursoRepository,
             LoteriasGateway loteriasGateway,
-            NotificacaoPort notificacaoPort) {
+            NotificacaoPort notificacaoPort,
+            @Value("${app.meuJogo:04,11,15,29,38,41}") String meuJogoConfig) {
         this.concursoRepository = concursoRepository;
         this.loteriasGateway = loteriasGateway;
         this.notificacaoPort = notificacaoPort;
+        this.meuJogoConfig = meuJogoConfig;
     }
 
     @Override
@@ -85,10 +89,10 @@ public class VerificarSorteioUseCaseImpl implements VerificarSorteioUseCase {
 
         } catch (Exception e) {
             resultado.append("Erro ao verificar sorteio: ").append(e.getMessage());
-            System.err.println("Erro ao verificar sorteio: " + e.getMessage());
+            log.error("Erro ao verificar sorteio: {}", e.getMessage(), e);
         }
 
-        System.out.println(resultado);
+        log.info("{}", resultado);
         return resultado.toString();
     }
 }

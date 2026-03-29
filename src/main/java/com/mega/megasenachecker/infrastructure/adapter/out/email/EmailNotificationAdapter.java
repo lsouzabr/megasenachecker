@@ -10,15 +10,16 @@ import org.springframework.stereotype.Component;
 public class EmailNotificationAdapter implements NotificacaoPort {
 
     private final JavaMailSender mailSender;
+    private final String emailSender;
+    private final String emailRecipient;
 
-    @Value("${app.email.sender}")
-    private String emailSender;
-
-    @Value("${app.email.recipient}")
-    private String emailRecipient;
-
-    public EmailNotificationAdapter(JavaMailSender mailSender) {
+    public EmailNotificationAdapter(
+            JavaMailSender mailSender,
+            @Value("${app.email.sender}") String emailSender,
+            @Value("${app.email.recipient}") String emailRecipient) {
         this.mailSender = mailSender;
+        this.emailSender = emailSender;
+        this.emailRecipient = emailRecipient;
     }
 
     @Override

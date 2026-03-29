@@ -16,7 +16,7 @@ public class ConcursoRepositoryAdapter implements ConcursoRepository {
 
     public ConcursoRepositoryAdapter(
             DynamoDbEnhancedClient dynamoDbEnhancedClient,
-            @Value("${DYNAMODB_TABLE_NAME}") String tableName) {
+            @Value("${spring.cloud.aws.dynamodb.table-name}") String tableName) {
         this.table = dynamoDbEnhancedClient.table(tableName, TableSchema.fromBean(ConcursoEntity.class));
     }
 
