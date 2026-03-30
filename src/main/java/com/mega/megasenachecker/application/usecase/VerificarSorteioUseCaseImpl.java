@@ -60,7 +60,7 @@ public class VerificarSorteioUseCaseImpl implements VerificarSorteioUseCase {
 
             resultado.append("Resultado obtido e salvo para o concurso: ").append(concurso.getNumero()).append("\n");
             resultado.append(dezenas).append("\n");
-            resultado.append("--------------------------------------------------\n");
+            resultado.append("Meu jogo:\n");
             resultado.append(meuJogo).append("\n");
             resultado.append("Quantidade de acertos: ").append(acertos.size()).append("\n");
 
