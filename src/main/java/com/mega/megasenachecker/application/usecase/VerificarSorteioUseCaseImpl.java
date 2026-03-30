@@ -58,6 +58,10 @@ public class VerificarSorteioUseCaseImpl implements VerificarSorteioUseCase {
                     .filter(dezenas::contains)
                     .collect(Collectors.toList());
 
+            concurso.setQuantidadeAcertos(acertos.size());
+            concurso.setNumerosAcertados(acertos);
+            concursoRepository.salvar(concurso);
+
             resultado.append("Resultado obtido e salvo para o concurso: ").append(concurso.getNumero()).append("\n");
             resultado.append(dezenas).append("\n");
             resultado.append("Meu jogo:\n");

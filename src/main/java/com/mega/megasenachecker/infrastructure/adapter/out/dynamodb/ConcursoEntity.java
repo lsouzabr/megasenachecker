@@ -11,6 +11,8 @@ public class ConcursoEntity {
     private Integer numero;
     private List<String> dezenasSorteadas;
     private String dataSorteio;
+    private Integer quantidadeAcertos;
+    private List<String> numerosAcertados;
 
     @DynamoDbPartitionKey
     public Integer getNumero() { return numero; }
@@ -21,5 +23,10 @@ public class ConcursoEntity {
 
     public String getDataSorteio() { return dataSorteio; }
     public void setDataSorteio(String dataSorteio) { this.dataSorteio = dataSorteio; }
-}
 
+    public Integer getQuantidadeAcertos() { return quantidadeAcertos; }
+    public void setQuantidadeAcertos(Integer quantidadeAcertos) { this.quantidadeAcertos = quantidadeAcertos; }
+
+    public List<String> getNumerosAcertados() { return numerosAcertados; }
+    public void setNumerosAcertados(List<String> numerosAcertados) { this.numerosAcertados = numerosAcertados; }
+}
