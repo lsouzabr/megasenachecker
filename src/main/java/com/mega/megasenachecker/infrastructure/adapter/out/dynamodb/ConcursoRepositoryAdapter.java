@@ -31,6 +31,8 @@ public class ConcursoRepositoryAdapter implements ConcursoRepository {
         entity.setNumero(concurso.getNumero());
         entity.setDezenasSorteadas(concurso.getDezenas());
         entity.setDataSorteio(concurso.getData());
+        entity.setQuantidadeAcertos(concurso.getQuantidadeAcertos());
+        entity.setNumerosAcertados(concurso.getNumerosAcertados());
         table.putItem(entity);
     }
 }

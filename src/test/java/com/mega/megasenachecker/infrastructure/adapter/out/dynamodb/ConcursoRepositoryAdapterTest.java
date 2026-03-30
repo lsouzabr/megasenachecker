@@ -59,6 +59,8 @@ class ConcursoRepositoryAdapterTest {
     @Test
     void salvar_deveChamarPutItemComEntidadeMapeadaCorretamente() {
         Concurso concurso = new Concurso(2800, List.of("04", "11", "15", "29", "38", "41"), "01/01/2026");
+        concurso.setQuantidadeAcertos(3);
+        concurso.setNumerosAcertados(List.of("04", "11", "15"));
         ArgumentCaptor<ConcursoEntity> captor = ArgumentCaptor.forClass(ConcursoEntity.class);
 
         adapter.salvar(concurso);
@@ -68,6 +70,8 @@ class ConcursoRepositoryAdapterTest {
         assertThat(entity.getNumero()).isEqualTo(2800);
         assertThat(entity.getDezenasSorteadas()).containsExactly("04", "11", "15", "29", "38", "41");
         assertThat(entity.getDataSorteio()).isEqualTo("01/01/2026");
+        assertThat(entity.getQuantidadeAcertos()).isEqualTo(3);
+        assertThat(entity.getNumerosAcertados()).containsExactly("04", "11", "15");
     }
 
     @Test

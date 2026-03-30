@@ -85,7 +85,8 @@ class VerificarSorteioUseCaseImplTest {
 
         useCase.verificar();
 
-        verify(concursoRepository).salvar(concurso);
+        // salvar é chamado 2 vezes: 1ª para registrar o concurso, 2ª para persistir os acertos
+        verify(concursoRepository, times(2)).salvar(concurso);
     }
 
     @Test
@@ -110,7 +111,30 @@ class VerificarSorteioUseCaseImplTest {
         assertThat(resultado).contains("Resultado obtido e salvo para o concurso: 2800");
     }
 
-    // ─── Contagem de acertos ───────────────────────────────────────────────────
+    @Test
+    void verificar_quandoConcursoNovo_deveSalvarAcertosNoBanco() {
+        // meuJogo: 04,11,15,29,38,41 — 2 acertos: 04, 11
+        Concurso concurso = new Concurso(2800, List.of("04", "11", "01", "02", "03", "05"), "01/01/2026");
+        when(loteriasGateway.buscarUltimoSorteio()).thenReturn(concurso);
+        when(concursoRepository.existe(2800)).thenReturn(false);
+
+        useCase.verificar();
+
+        assertThat(concurso.getQuantidadeAcertos()).isEqualTo(2);
+        assertThat(concurso.getNumerosAcertados()).containsExactly("04", "11");
+    }
+
+    @Test
+    void verificar_quandoSemAcertos_deveSalvarNumerosAcertadosVazio() {
+        Concurso concurso = new Concurso(2800, List.of("01", "02", "03", "05", "06", "07"), "01/01/2026");
+        when(loteriasGateway.buscarUltimoSorteio()).thenReturn(concurso);
+        when(concursoRepository.existe(2800)).thenReturn(false);
+
+        useCase.verificar();
+
+        assertThat(concurso.getQuantidadeAcertos()).isEqualTo(0);
+        assertThat(concurso.getNumerosAcertados()).isEmpty();
+    }
 
     @Test
     void verificar_quandoSemAcertos_naoDeveConterMensagemEspecial() {
