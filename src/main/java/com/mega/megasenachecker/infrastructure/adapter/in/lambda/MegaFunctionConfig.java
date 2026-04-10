@@ -12,9 +12,7 @@ public class MegaFunctionConfig {
     @Bean
     public Function<String, String> processarMega(VerificarSorteioUseCase verificarSorteioUseCase) {
         return input -> {
-            System.out.println("Rodando com input: " + input);
             return verificarSorteioUseCase.verificar();
         };
     }
 }
-
