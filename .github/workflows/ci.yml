@@ -20,13 +20,5 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Build (sem testes)
-        run: mvn -B clean package -DskipTests
-
-      - name: Rodar testes
-        run: mvn test
-
-      - name: Verificar se app sobe (opcional)
-        run: |
-          java -jar target/*.jar &
-          sleep 10
+      - name: Build + Test
+        run: mvn -B clean verify
