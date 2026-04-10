@@ -121,7 +121,7 @@ class VerificarSorteioUseCaseImplTest {
         useCase.verificar();
 
         assertThat(concurso.getQuantidadeAcertos()).isEqualTo(2);
-        assertThat(concurso.getNumerosAcertados()).containsExactly("04", "11");
+        assertThat(concurso.getNumerosAcertados()).isEqualTo("04,11");
     }
 
     @Test

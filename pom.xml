@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.mega</groupId>
 	<artifactId>megasena-checker</artifactId>
-	<version>1.0.3-SNAPSHOT</version>
+	<version>1.0.4-SNAPSHOT</version>
 	<name>megasena-checker</name>
 	<description>Megasena Checker</description>
 	<properties>

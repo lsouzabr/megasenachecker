@@ -8,7 +8,7 @@ public class Concurso {
     private List<String> dezenas;
     private String data;
     private Integer quantidadeAcertos;
-    private List<String> numerosAcertados;
+    private String numerosAcertados;
 
     public Concurso() {}
 
@@ -30,6 +30,7 @@ public class Concurso {
     public Integer getQuantidadeAcertos() { return quantidadeAcertos; }
     public void setQuantidadeAcertos(Integer quantidadeAcertos) { this.quantidadeAcertos = quantidadeAcertos; }
 
-    public List<String> getNumerosAcertados() { return numerosAcertados; }
-    public void setNumerosAcertados(List<String> numerosAcertados) { this.numerosAcertados = numerosAcertados; }
+    public String getNumerosAcertados() { return numerosAcertados; }
+    public void setNumerosAcertados(String numerosAcertados) { this.numerosAcertados = numerosAcertados; }
 }
+

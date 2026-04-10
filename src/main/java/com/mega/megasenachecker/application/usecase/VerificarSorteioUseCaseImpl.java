@@ -59,7 +59,7 @@ public class VerificarSorteioUseCaseImpl implements VerificarSorteioUseCase {
                     .collect(Collectors.toList());
 
             concurso.setQuantidadeAcertos(acertos.size());
-            concurso.setNumerosAcertados(acertos);
+            concurso.setNumerosAcertados(String.join(",", acertos));
             concursoRepository.salvar(concurso);
 
             resultado.append("Resultado obtido e salvo para o concurso: ").append(concurso.getNumero()).append("\n");
@@ -80,10 +80,8 @@ public class VerificarSorteioUseCaseImpl implements VerificarSorteioUseCase {
                 resultado.append("🏆 6 acertos → \"Você acabou de mudar de vida.\"\n");
             }
 
-            resultado.append("--------------------------------------------------\n");
-
             notificacaoPort.notificar(
-                    "Resultado do Concurso " + concurso.getNumero() + " - Acertos: " + acertos.size(),
+                    "Concurso " + concurso.getNumero() + " - Acertos: " + acertos.size(),
                     resultado.toString()
             );
 
@@ -96,4 +94,3 @@ public class VerificarSorteioUseCaseImpl implements VerificarSorteioUseCase {
         return resultado.toString();
     }
 }
-

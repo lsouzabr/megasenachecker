@@ -9,6 +9,9 @@ import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Component
 public class ConcursoRepositoryAdapter implements ConcursoRepository {
 
@@ -32,7 +35,11 @@ public class ConcursoRepositoryAdapter implements ConcursoRepository {
         entity.setDezenasSorteadas(concurso.getDezenas());
         entity.setDataSorteio(concurso.getData());
         entity.setQuantidadeAcertos(concurso.getQuantidadeAcertos());
-        entity.setNumerosAcertados(concurso.getNumerosAcertados());
+        String numerosAcertados = concurso.getNumerosAcertados();
+        List<String> listaAcertados = (numerosAcertados == null || numerosAcertados.isEmpty())
+                ? List.of()
+                : Arrays.asList(numerosAcertados.split(","));
+        entity.setNumerosAcertados(listaAcertados);
         table.putItem(entity);
     }
 }

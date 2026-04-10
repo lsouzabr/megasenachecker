@@ -1,12 +1,16 @@
 # 🎰 Megasena Checker
 
-Aplicação serverless desenvolvida com **Spring Boot** e implantada na **AWS Lambda** com o objetivo de conferir automaticamente os resultados da Mega-Sena, comparar com um jogo pré-configurado e enviar uma notificação por e-mail com o resultado.
+Aplicação desenvolvida com **Spring Boot** que confere automaticamente os resultados da Mega-Sena, compara com um jogo pré-configurado e envia uma notificação por e-mail com o resultado.
+
+Suporta **dois modos de execução**:
+- **Local / standalone** — executa assim que a JVM sobe, sem servidor web (sem Tomcat)
+- **AWS Lambda** — disparado por agendamento via AWS EventBridge
 
 ---
 
-## 📌 Objetivo
+## 📌 Fluxo de execução
 
-A cada execução (agendada via **AWS EventBridge**), a aplicação:
+A cada execução, a aplicação:
 
 1. Busca o resultado do último sorteio da Mega-Sena via API pública
 2. Verifica se o concurso já foi processado anteriormente (evita duplicidade)
@@ -57,33 +61,29 @@ src/main/java/com/mega/megasenachecker/
         └── DynamoConfig                  ← Configuração Spring/AWS
 ```
 
-### Por que Arquitetura Hexagonal?
-
 | Benefício | Descrição |
 |---|---|
-| **Testabilidade** | O domínio e o caso de uso são testados com mocks simples, sem subir contexto Spring ou AWS |
-| **Isolamento** | A lógica de negócio não conhece DynamoDB, SES, ou qualquer framework |
+| **Testabilidade** | Domínio e caso de uso testados com mocks simples, sem subir contexto Spring ou AWS |
+| **Isolamento** | A lógica de negócio não conhece DynamoDB, SES ou qualquer framework |
 | **Substituibilidade** | Qualquer adapter pode ser trocado sem impactar o domínio |
-| **Clareza** | Cada camada tem uma responsabilidade bem definida |
 
 ---
 
-## ☁️ Infraestrutura AWS
+## 🚀 Modos de execução
 
-| Serviço | Uso |
-|---|---|
-| **AWS Lambda** | Execução da aplicação serverless |
-| **AWS EventBridge** | Agendamento automático da execução |
-| **Amazon DynamoDB** | Persistência dos concursos processados |
-| **Amazon SES** | Envio de e-mail com o resultado |
+### 1. Local / Standalone
 
-### Handler configurado na Lambda
+A aplicação **não sobe servidor web**. Assim que o contexto Spring é inicializado, o `MegasenaCheckerApplication` (que implementa `CommandLineRunner`) chama `verificar()` automaticamente e encerra o processo.
 
-```
-com.mega.megasenachecker.LambdaHandler
+```bash
+java -jar target/megasena-checker-<versão>.jar
 ```
 
-### Fluxo de execução
+> Útil para execução agendada via `cron`, scripts ou invocação direta em EC2.
+
+### 2. AWS Lambda
+
+O artefato `*-aws.jar` (gerado pelo `maven-shade-plugin`) é o pacote a ser feito o upload na Lambda.
 
 ```
 EventBridge (cron)
@@ -94,16 +94,63 @@ AWS Lambda (LambdaHandler)
       ▼
 MegaFunctionConfig → VerificarSorteioUseCaseImpl
       │
-      ├─→ LoteriasApiAdapter       (busca resultado na API pública)
+      ├─→ LoteriasApiAdapter        (busca resultado na API pública)
       ├─→ ConcursoRepositoryAdapter (verifica/salva no DynamoDB)
       └─→ EmailNotificationAdapter  (envia resultado via SES)
 ```
+
+#### Configuração na AWS Lambda
+
+| Campo | Valor |
+|---|---|
+| **Runtime** | Java 21 |
+| **Handler** | `com.mega.megasenachecker.infrastructure.adapter.in.lambda.LambdaHandler` |
+| **Memória recomendada** | 512 MB |
+| **Timeout recomendado** | 30 segundos |
+| **Arquivo de deploy** | `target/megasena-checker-<versão>-aws.jar` |
+
+---
+
+## ☁️ Infraestrutura AWS
+
+| Serviço | Uso |
+|---|---|
+| **AWS Lambda** | Execução serverless da aplicação |
+| **AWS EventBridge** | Agendamento automático da execução |
+| **Amazon DynamoDB** | Persistência dos concursos processados |
+| **Amazon SES** | Envio de e-mail com o resultado |
+
+---
+
+## ⚙️ Variáveis de Ambiente
+
+Todas as configurações sensíveis são carregadas a partir do arquivo `.env` na raiz do projeto.
+
+Crie um arquivo `.env` com o seguinte conteúdo:
+
+```env
+# AWS SES - credenciais SMTP
+MAIL_USERNAME=sua_access_key_smtp
+MAIL_PASSWORD=sua_secret_key_smtp
+
+# E-mail
+EMAIL_SENDER=seu-email@dominio.com
+EMAIL_RECIPIENT=seu-email@dominio.com
+
+# DynamoDB
+DYNAMODB_TABLE_NAME=megasena
+
+# Dezenas do seu jogo (separadas por vírgula, sem espaços)
+MEU_JOGO=04,11,15,29,38,41
+```
+
+> ⚠️ O arquivo `.env` **não deve ser versionado**. Adicione-o ao `.gitignore`.
 
 ---
 
 ## 🧪 Testes Unitários
 
-O projeto conta com **35 testes unitários** cobrindo todas as camadas, executados com **JUnit 5** e **Mockito**, sem necessidade de subir contexto Spring ou conexões externas.
+O projeto conta com **37 testes unitários** cobrindo todas as camadas, executados com **JUnit 5** e **Mockito**, sem necessidade de subir contexto Spring ou conexões externas.
 
 | Classe testada | Arquivo de teste | Cenários |
 |---|---|---|
@@ -115,30 +162,24 @@ O projeto conta com **35 testes unitários** cobrindo todas as camadas, executad
 | `MegaFunctionConfig` | `MegaFunctionConfigTest` | Delegação ao use case, retorno correto, inputs variados |
 | Contexto Spring | `MegasenaCheckerApplicationTests` | Carregamento do contexto |
 
-
-## ⚙️ Variáveis de Ambiente
-
-Todas as configurações sensíveis são carregadas a partir do arquivo `.env` na raiz do projeto (nunca versionar este arquivo).
-
-Crie um arquivo `.env` com o seguinte conteúdo:
-
-```env
-# AWS SES - credenciais SMTP
-MAIL_USERNAME=sua_access_key_smtp
-MAIL_PASSWORD=sua_secret_key_smtp
-
-# E-mail
-EMAIL_SENDER=seu-email@gmail.com
-EMAIL_RECIPIENT=seu-email@gmail.com
-
-# DynamoDB
-DYNAMODB_TABLE_NAME=megasena
-
-# Dezenas do seu jogo (separadas por vírgula)
-MEU_JOGO=04,11,15,29,38,41
+```bash
+mvn test
 ```
 
-> ⚠️ O arquivo `.env` **não deve ser versionado**. Adicione-o ao `.gitignore`.
+---
+
+## 📦 Build
+
+```bash
+mvn clean package
+```
+
+Dois artefatos são gerados em `target/`:
+
+| Artefato | Uso |
+|---|---|
+| `megasena-checker-<versão>.jar` | Execução local / standalone |
+| `megasena-checker-<versão>-aws.jar` | Deploy na AWS Lambda (uber-jar gerado pelo maven-shade-plugin) |
 
 ---
 
@@ -150,31 +191,8 @@ MEU_JOGO=04,11,15,29,38,41
 | Spring Boot | 3.3.5 | Framework base |
 | Spring Cloud Function | 2023.0.3 | Integração com AWS Lambda |
 | AWS SDK v2 (DynamoDB Enhanced) | 3.1.1 | Persistência no DynamoDB |
-| Spring Mail | - | Envio de e-mail via SES |
-| JUnit 5 | - | Testes unitários |
-| Mockito | - | Mocks nos testes |
-
----
-
-## 📦 Build e Deploy
-
-### Gerar o artefato para AWS Lambda
-
-O arquivo gerado para deploy na Lambda é:
-
-```
-target/megasena-checker-0.0.1-SNAPSHOT-aws.jar
-```
-
-### Configuração na AWS Lambda
-
-| Campo | Valor |
-|---|---|
-| **Runtime** | Java 21 |
-| **Handler** | `com.mega.megasenachecker.LambdaHandler` |
-| **Memória recomendada** | 512 MB |
-| **Timeout recomendado** | 30 segundos |
-| **Arquivo de deploy** | `*-aws.jar` (gerado pelo maven-shade-plugin) |
+| Spring Mail | — | Envio de e-mail via SES |
+| JUnit 5 + Mockito | — | Testes unitários |
 
 ---
 
@@ -184,9 +202,9 @@ target/megasena-checker-0.0.1-SNAPSHOT-aws.jar
 Assunto: Resultado do Concurso 2800 - Acertos: 4
 
 Resultado obtido e salvo para o concurso: 2800
-Dezenas sorteadas: [04, 11, 15, 29, 06, 07]
---------------------------------------------------
-Meu jogo: [04, 11, 15, 29, 38, 41]
+[04, 11, 15, 29, 06, 07]
+Meu jogo:
+[04, 11, 15, 29, 38, 41]
 Quantidade de acertos: 4
 Números acertados: [04, 11, 15, 29]
 🔥 4 acertos → "Agora ficou interessante..."
@@ -205,13 +223,11 @@ megasena-checker/
 │   │   │   ├── domain/           ← Entidades e portas
 │   │   │   ├── application/      ← Casos de uso
 │   │   │   ├── infrastructure/   ← Adapters, config e entrypoints
-│   │   │   ├── LambdaHandler.java
-│   │   │   └── MegasenaCheckerApplication.java
+│   │   │   └── MegasenaCheckerApplication.java  ← CommandLineRunner
 │   │   └── resources/
 │   │       └── application.properties
-│   └── test/                     ← 35 testes unitários
+│   └── test/                     ← 37 testes unitários
 ├── .env                          ← Variáveis de ambiente (não versionar)
 ├── pom.xml
 └── README.md
 ```
-
